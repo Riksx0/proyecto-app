@@ -1,17 +1,107 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+    <ion-title>Ajustes y Configuración</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding tab-page-content">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
+      <ion-title size="large">Ajustes</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <div class="settings-container">
+
+    <!-- Tarjeta de Preferencias de la App -->
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>Apariencia y Preferencias</ion-card-title>
+        <ion-card-subtitle>Personaliza la interfaz de la aplicación</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-list lines="full">
+          <ion-item>
+            <ion-icon slot="start" [name]="darkMode ? 'moon' : 'sunny'" [color]="darkMode ? 'tertiary' : 'warning'"></ion-icon>
+            <ion-label>
+              <h2>Modo Oscuro</h2>
+              <p>Cambia el tema de la aplicación</p>
+            </ion-label>
+            <ion-toggle [(ngModel)]="darkMode" (ionChange)="toggleDarkMode($event)"></ion-toggle>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Tarjeta de Datos de la Cuenta -->
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>Editar Datos de la Cuenta</ion-card-title>
+        <ion-card-subtitle>Modifica tu información personal</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form (ngSubmit)="saveProfile()">
+          <ion-list lines="full">
+            <ion-item>
+              <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+              <ion-input
+                label="Nombre"
+                labelPlacement="floating"
+                type="text"
+                [(ngModel)]="userData.fname"
+                name="fname"
+                placeholder="Ingresa tu nombre"
+                required>
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+              <ion-input
+                label="Apellido(s)"
+                labelPlacement="floating"
+                type="text"
+                [(ngModel)]="userData.lname"
+                name="lname"
+                placeholder="Ingresa tu apellido"
+                required>
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-icon slot="start" name="mail-outline" color="primary"></ion-icon>
+              <ion-input
+                label="Correo Electrónico"
+                labelPlacement="floating"
+                type="email"
+                [(ngModel)]="userData.email"
+                name="email"
+                placeholder="ejemplo@correo.com"
+                required>
+              </ion-input>
+            </ion-item>
+          </ion-list>
+
+          <div class="ion-padding-top">
+            <ion-button expand="block" type="submit" [disabled]="isSaving">
+              <ion-icon slot="start" name="save-outline"></ion-icon>
+              {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <!-- Toast de notificación -->
+  <ion-toast
+    [isOpen]="showToast"
+    [message]="toastMessage"
+    [duration]="2500"
+    [color]="toastColor"
+    (didDismiss)="showToast = false">
+  </ion-toast>
 </ion-content>

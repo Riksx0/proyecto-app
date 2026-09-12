@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { triangle, images, square, logOut, person } from 'ionicons/icons';
+import { triangle, images, settings, logOut, person } from 'ionicons/icons';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { AuthService } from '../services/auth.service';
 })
 export class TabsPage {
   constructor(private authService: AuthService) {
-    addIcons({ triangle, images, square, logOut, person });
+    addIcons({ triangle, images, settings, logOut, person });
   }
 
   logout() {

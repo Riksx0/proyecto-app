@@ -37,4 +37,11 @@ export class AuthService {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
+
+  updateUserData(updatedFields: { fname?: string; lname?: string; email?: string }): any {
+    const currentUser = this.getUser() || {};
+    const newUser = { ...currentUser, ...updatedFields };
+    localStorage.setItem('user', JSON.stringify(newUser));
+    return newUser;
+  }
 }

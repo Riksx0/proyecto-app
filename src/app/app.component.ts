@@ -10,5 +10,16 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  constructor() {}
+  constructor() {
+    this.initDarkMode();
+  }
+
+  private initDarkMode() {
+    const savedTheme = localStorage.getItem('darkMode');
+    const isDark = savedTheme !== null 
+      ? savedTheme === 'true'
+      : window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    document.documentElement.classList.toggle('ion-palette-dark', isDark);
+  }
 }
