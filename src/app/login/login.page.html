@@ -1,0 +1,82 @@
+<ion-content>
+  <form id="msform">
+
+    <!-- TABS: Login / Registro -->
+    <div class="mode-toggle">
+      <button type="button" [class.active]="mode === 'login'" (click)="setMode('login')">Iniciar Sesión</button>
+      <button type="button" [class.active]="mode === 'register'" (click)="setMode('register')">Registrarse</button>
+    </div>
+
+    <!-- ==================== MODO LOGIN ==================== -->
+    <div *ngIf="mode === 'login'" class="login-box">
+      <h2 class="fs-title">Bienvenido</h2>
+      <h3 class="fs-subtitle">Ingresa tus credenciales</h3>
+
+      <input type="text" name="lemail" [(ngModel)]="userData.email" placeholder="Correo electrónico" />
+      <input type="password" name="lpass" [(ngModel)]="userData.pass" placeholder="Contraseña" />
+
+      <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
+
+      <input
+        type="button"
+        class="action-button submit"
+        [value]="loading ? 'Cargando...' : 'Entrar'"
+        [disabled]="loading"
+        (click)="iniciarSesion()"
+      />
+    </div>
+
+    <!-- ==================== MODO REGISTRO ==================== -->
+    <div *ngIf="mode === 'register'">
+      <ul id="progressbar">
+        <li [class.active]="currentStep >= 1">Cuenta</li>
+        <li [class.active]="currentStep >= 2">Redes</li>
+        <li [class.active]="currentStep >= 3">Datos</li>
+      </ul>
+
+      <div class="fieldset-container" [@stepAnimation]="currentStep">
+
+        <fieldset *ngIf="currentStep === 1">
+          <h2 class="fs-title">Crear cuenta</h2>
+          <h3 class="fs-subtitle">Paso 1 de 3</h3>
+          <input type="text"     name="email" [(ngModel)]="userData.email" placeholder="Correo electrónico" />
+          <input type="password" name="pass"  [(ngModel)]="userData.pass"  placeholder="Contraseña" />
+          <input type="password" name="cpass" [(ngModel)]="userData.cpass" placeholder="Confirmar contraseña" />
+          <input type="button" class="next action-button" value="Siguiente" (click)="next()" />
+        </fieldset>
+
+        <fieldset *ngIf="currentStep === 2">
+          <h2 class="fs-title">Redes Sociales</h2>
+          <h3 class="fs-subtitle">Paso 2 de 3</h3>
+          <input type="text" name="twitter"  [(ngModel)]="userData.twitter"  placeholder="Twitter" />
+          <input type="text" name="facebook" [(ngModel)]="userData.facebook" placeholder="Facebook" />
+          <input type="text" name="gplus"    [(ngModel)]="userData.gplus"    placeholder="Google+" />
+          <input type="button" class="previous action-button" value="Anterior"  (click)="previous()" />
+          <input type="button" class="next action-button"     value="Siguiente" (click)="next()" />
+        </fieldset>
+
+        <fieldset *ngIf="currentStep === 3">
+          <h2 class="fs-title">Datos Personales</h2>
+          <h3 class="fs-subtitle">Paso 3 de 3</h3>
+          <input type="text" name="fname"   [(ngModel)]="userData.fname"   placeholder="Nombre" />
+          <input type="text" name="lname"   [(ngModel)]="userData.lname"   placeholder="Apellido" />
+          <input type="text" name="phone"   [(ngModel)]="userData.phone"   placeholder="Teléfono" />
+          <textarea          name="address" [(ngModel)]="userData.address"  placeholder="Dirección"></textarea>
+
+          <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
+
+          <input type="button" class="previous action-button" value="Anterior" (click)="previous()" />
+          <input
+            type="button"
+            class="submit action-button"
+            [value]="loading ? 'Registrando...' : 'Registrarse'"
+            [disabled]="loading"
+            (click)="submit()"
+          />
+        </fieldset>
+
+      </div>
+    </div>
+
+  </form>
+</ion-content>
