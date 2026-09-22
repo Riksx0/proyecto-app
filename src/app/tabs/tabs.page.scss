@@ -1,17 +1,25 @@
-ion-tab-button {
-  transition: transform 0.2s ease, color 0.2s ease;
+.eve-tab-bar {
+  --background: #0b0f19;
+  --border: 1px solid rgba(56, 189, 248, 0.15);
+  --color: #64748b;
+  --color-selected: #38bdf8;
+  height: 56px;
 
-  ion-icon {
-    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
+  ion-tab-button {
+    font-size: 11px;
+    font-weight: 600;
 
-  &.tab-selected {
-    ion-icon {
-      transform: scale(1.22);
+    &.tab-selected {
+      ion-icon {
+        filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+      }
     }
-  }
 
-  &:active {
-    transform: scale(0.92);
+    &.tab-logout {
+      --color: #64748b;
+      &:hover {
+        --color: #f87171;
+      }
+    }
   }
 }

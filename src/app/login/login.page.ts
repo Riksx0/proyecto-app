@@ -1,138 +1,166 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent } from '@ionic/angular';
+import {
+  IonContent,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonCardContent,
+  IonIcon,
+  IonSpinner
+} from '@ionic/angular';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
-import { trigger, transition, style, animate, query, group } from '@angular/animations';
+import { EveMarketService } from '../services/eve-market.service';
+import { addIcons } from 'ionicons';
+import {
+  personOutline,
+  personAddOutline,
+  lockClosedOutline,
+  rocketOutline,
+  checkmarkCircleOutline,
+  alertCircleOutline,
+  shieldCheckmarkOutline,
+  sparklesOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent],
-  animations: [
-    trigger('stepAnimation', [
-      transition('1 => 2, 2 => 3', [
-        query(':enter, :leave', style({ position: 'absolute', width: '80%', left: '10%' }), { optional: true }),
-        query(':enter', style({ transform: 'translateX(50%)', opacity: 0 }), { optional: true }),
-        group([
-          query(':leave', animate('800ms cubic-bezier(0.68, -0.55, 0.265, 1.55)', style({ transform: 'scale(0.8)', opacity: 0 })), { optional: true }),
-          query(':enter', animate('800ms cubic-bezier(0.68, -0.55, 0.265, 1.55)', style({ transform: 'translateX(0)', opacity: 1 })), { optional: true })
-        ])
-      ]),
-      transition('3 => 2, 2 => 1', [
-        query(':enter, :leave', style({ position: 'absolute', width: '80%', left: '10%' }), { optional: true }),
-        query(':enter', style({ transform: 'scale(0.8)', opacity: 0 }), { optional: true }),
-        group([
-          query(':leave', animate('800ms cubic-bezier(0.68, -0.55, 0.265, 1.55)', style({ transform: 'translateX(50%)', opacity: 0 })), { optional: true }),
-          query(':enter', animate('800ms cubic-bezier(0.68, -0.55, 0.265, 1.55)', style({ transform: 'scale(1)', opacity: 1 })), { optional: true })
-        ])
-      ])
-    ])
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonIcon,
+    IonSpinner
   ]
 })
 export class LoginPage {
-  /** Modo actual: 'login' o 'register' */
   mode: 'login' | 'register' = 'login';
 
-  /** Paso actual del formulario de registro */
-  currentStep: number = 1;
+  username: string = '';
+  pass: string = '';
+  confirmPass: string = '';
 
-  /** Estado de carga para deshabilitar botones */
   loading: boolean = false;
-
-  /** Mensaje de error para mostrar al usuario */
   errorMsg: string = '';
-
-  /** Datos del formulario */
-  userData = {
-    email: '', pass: '', cpass: '',
-    twitter: '', facebook: '', gplus: '',
-    fname: '', lname: '', phone: '', address: ''
-  };
+  successMsg: string = '';
 
   constructor(
-    private http: HttpClient,
     private authService: AuthService,
+    private marketService: EveMarketService,
     private router: Router
-  ) {}
+  ) {
+    addIcons({
+      personOutline,
+      personAddOutline,
+      lockClosedOutline,
+      rocketOutline,
+      checkmarkCircleOutline,
+      alertCircleOutline,
+      shieldCheckmarkOutline,
+      sparklesOutline
+    });
+  }
 
-  /** Cambia entre los modos login y registro */
-  setMode(m: 'login' | 'register') {
-    this.mode = m;
+  setMode(newMode: 'login' | 'register') {
+    this.mode = newMode;
     this.errorMsg = '';
-    this.currentStep = 1;
+    this.successMsg = '';
+    this.pass = '';
+    this.confirmPass = '';
   }
 
-  next() {
-    if (this.currentStep < 3) this.currentStep++;
-  }
-
-  previous() {
-    if (this.currentStep > 1) this.currentStep--;
-  }
-
-  /** Inicia sesión contra el backend PHP */
   iniciarSesion() {
     this.errorMsg = '';
+    this.successMsg = '';
 
-    if (!this.userData.email || !this.userData.pass) {
-      this.errorMsg = 'Por favor ingresa correo y contraseña.';
+    if (!this.username.trim()) {
+      this.errorMsg = 'Por favor ingresa tu nombre de piloto (usuario).';
+      return;
+    }
+
+    if (!this.pass.trim()) {
+      this.errorMsg = 'Por favor ingresa tu contraseña.';
       return;
     }
 
     this.loading = true;
 
-    this.authService.login(this.userData.email, this.userData.pass).subscribe({
-      next: (response: any) => {
+    this.authService.login(this.username, this.pass).subscribe({
+      next: (res) => {
         this.loading = false;
-        if (response.status === 'success') {
-          this.router.navigate(['/']);
+        if (res.success && res.user) {
+          this.marketService.loadUserData(res.user.username);
+          this.successMsg = `¡Bienvenido Piloto ${res.user.username}! Conectando con New Eden...`;
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 500);
         } else {
-          this.errorMsg = response.message || 'Credenciales incorrectas.';
+          this.errorMsg = res.message || 'No se pudo verificar el piloto.';
         }
       },
       error: (err) => {
         this.loading = false;
         console.error(err);
-        this.errorMsg = 'No se pudo conectar al servidor. ¿Está XAMPP activo?';
+        this.errorMsg = 'Error al procesar el inicio de sesión.';
       }
     });
   }
 
-  /** Registra un nuevo usuario en el backend PHP */
-  submit() {
+  registrar() {
     this.errorMsg = '';
+    this.successMsg = '';
 
-    if (this.userData.pass !== this.userData.cpass) {
-      this.errorMsg = 'Las contraseñas no coinciden.';
+    if (!this.username.trim()) {
+      this.errorMsg = 'Por favor ingresa un nombre de piloto.';
       return;
     }
 
-    if (!this.userData.email || !this.userData.pass) {
-      this.errorMsg = 'El correo y la contraseña son obligatorios.';
+    if (!this.pass.trim()) {
+      this.errorMsg = 'Por favor crea una contraseña.';
+      return;
+    }
+
+    if (this.pass.length < 4) {
+      this.errorMsg = 'La contraseña debe tener al menos 4 caracteres.';
+      return;
+    }
+
+    if (this.pass !== this.confirmPass) {
+      this.errorMsg = 'Las contraseñas no coinciden.';
       return;
     }
 
     this.loading = true;
 
-    this.http.post('http://localhost/api/register.php', this.userData).subscribe({
-      next: (response: any) => {
+    this.authService.register(this.username, this.pass).subscribe({
+      next: (res) => {
         this.loading = false;
-        if (response.status === 'success') {
-          alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
-          this.setMode('login');
+        if (res.success) {
+          this.successMsg = res.message;
+          // Dejar el nombre listo y pasar al modo login
+          setTimeout(() => {
+            this.setMode('login');
+            this.successMsg = '¡Registro completado! Ingresa tu contraseña para entrar.';
+          }, 1200);
         } else {
-          this.errorMsg = response.message || 'Error al registrar usuario.';
+          this.errorMsg = res.message || 'Error al registrar el piloto.';
         }
       },
-      error: (error) => {
+      error: (err) => {
         this.loading = false;
-        console.error('Error del servidor:', error);
-        this.errorMsg = 'Error al conectar con el servidor PHP. ¿Está XAMPP activo?';
+        console.error(err);
+        this.errorMsg = 'Error al registrar piloto.';
       }
     });
   }

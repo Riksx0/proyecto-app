@@ -1,76 +1,102 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Inicio</ion-title>
+  <ion-toolbar class="eve-toolbar">
+    <ion-title>Piloto & Favoritos</ion-title>
+    <ion-button slot="end" fill="clear" color="light" (click)="logout()">
+      <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Inicio</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="eve-content">
+  <ion-refresher slot="fixed" (ionRefresh)="refreshPrices($event)">
+    <ion-refresher-content pullingText="Desliza para actualizar precios" refreshingSpinner="crescent"></ion-refresher-content>
+  </ion-refresher>
 
-  <div class="profile-container">
-
-    <!-- Avatar y saludo principal -->
-    <div class="avatar-box">
-      <ion-icon name="person-circle" class="profile-avatar-icon"></ion-icon>
-      <h1 class="welcome-title">¡Bienvenido!</h1>
-      <h2 class="user-display-name">{{ displayName }}</h2>
-      <p class="user-handle">&#64;{{ username }}</p>
+  <!-- Tarjeta de Perfil del Piloto -->
+  <div class="pilot-profile-card">
+    <div class="portrait-container">
+      <img
+        [src]="getPortraitSrc()"
+        alt="Portrait de Piloto"
+        class="pilot-portrait"
+        (error)="onPortraitError($event)"
+      />
+      <div class="online-indicator"></div>
     </div>
+    <div class="pilot-info">
+      <span class="security-badge">+5.0 CONCORD Clean</span>
+      <h2>{{ user?.username || 'Piloto EVE' }}</h2>
+      <p class="corp-name">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        {{ user?.corporation || 'Federación Galáctica' }}
+      </p>
+      <div class="hub-location">
+        <ion-icon name="storefront-outline"></ion-icon>
+        <span>Hub Principal: <strong>Jita IV - Moon 4 (The Forge)</strong></span>
+      </div>
+    </div>
+  </div>
 
-    <!-- Tarjeta con información del usuario -->
-    <ion-card class="info-card">
-      <ion-card-header>
-        <ion-card-title>Información de la Cuenta</ion-card-title>
-        <ion-card-subtitle>Datos registrados en el sistema</ion-card-subtitle>
-      </ion-card-header>
+  <!-- Sección de Favoritos del Mercado -->
+  <div class="section-header">
+    <div class="title-with-icon">
+      <ion-icon name="star" class="star-icon"></ion-icon>
+      <h3>Mis Ítems Favoritos</h3>
+    </div>
+    <ion-badge color="primary">{{ favorites.length }} en seguimiento</ion-badge>
+  </div>
 
-      <ion-card-content>
-        <ion-list lines="inset">
-          
-          <ion-item *ngIf="user?.fname">
-            <ion-icon slot="start" name="person" color="primary"></ion-icon>
-            <ion-label>
-              <h3>Nombre</h3>
-              <p>{{ user.fname }}</p>
-            </ion-label>
-          </ion-item>
+  <!-- Estado vacío si no hay favoritos -->
+  <div class="empty-state" *ngIf="favorites.length === 0">
+    <ion-icon name="cart-outline"></ion-icon>
+    <h4>Aún no tienes favoritos</h4>
+    <p>Explora el catálogo del mercado en la Tab 2 y presiona la estrella en cualquier ítem.</p>
+    <ion-button fill="outline" color="primary" (click)="goToMarket()">
+      Explorar Mercado de Jita
+    </ion-button>
+  </div>
 
-          <ion-item *ngIf="user?.lname">
-            <ion-icon slot="start" name="person" color="primary"></ion-icon>
-            <ion-label>
-              <h3>Apellido(s)</h3>
-              <p>{{ user.lname }}</p>
-            </ion-label>
-          </ion-item>
+  <!-- Lista de Favoritos -->
+  <div class="favorites-grid" *ngIf="favorites.length > 0">
+    <ion-card *ngFor="let fav of favorites" class="market-item-card" (click)="analyzeItem(fav.item)">
+      <div class="card-top">
+        <div class="item-visual">
+          <img [src]="fav.item.iconUrl || 'https://wsrv.nl/?url=https://images.evetech.net/types/' + fav.item.typeId + '/icon?size=64&w=64'" [alt]="fav.item.name" />
+        </div>
+        <div class="item-meta">
+          <span class="item-category">{{ fav.item.groupName }}</span>
+          <h4 class="item-name">{{ fav.item.name }}</h4>
+          <span class="station-tag">{{ fav.price?.stationName || 'Jita 4-4' }}</span>
+        </div>
+        <button class="remove-fav-btn" (click)="removeFavorite(fav.item, $event)" title="Quitar de favoritos">
+          <ion-icon name="star"></ion-icon>
+        </button>
+      </div>
 
-          <ion-item>
-            <ion-icon slot="start" name="mail" color="primary"></ion-icon>
-            <ion-label>
-              <h3>Correo Electrónico</h3>
-              <p>{{ user?.email || 'Sin correo' }}</p>
-            </ion-label>
-          </ion-item>
+      <div class="card-pricing" *ngIf="!fav.loading; else priceLoading">
+        <div class="price-box sell">
+          <span class="label">Venta Mín (Jita Sell)</span>
+          <span class="value">{{ formatIsk(fav.price?.sellMin) }}</span>
+        </div>
+        <div class="price-box buy">
+          <span class="label">Compra Máx (Jita Buy)</span>
+          <span class="value">{{ formatIsk(fav.price?.buyMax) }}</span>
+        </div>
+      </div>
 
-        </ion-list>
-      </ion-card-content>
+      <ng-template #priceLoading>
+        <div class="price-loading-box">
+          <ion-spinner name="dots"></ion-spinner>
+          <span>Consultando Tranquility Feed...</span>
+        </div>
+      </ng-template>
+
+      <div class="card-actions">
+        <ion-button fill="clear" size="small" color="secondary" (click)="analyzeItem(fav.item)">
+          <ion-icon name="trending-up-outline" slot="start"></ion-icon>
+          Ver Tendencia en Analyzer
+        </ion-button>
+      </div>
     </ion-card>
-
-    <!-- Botones de Acción -->
-    <div class="actions-box">
-      <ion-button expand="block" (click)="goToGallery()" class="action-btn">
-        <ion-icon slot="start" name="camera"></ion-icon>
-        Ver Galería de Fotos
-      </ion-button>
-
-      <ion-button expand="block" fill="outline" color="danger" (click)="logout()" class="action-btn">
-        <ion-icon slot="start" name="log-out"></ion-icon>
-        Cerrar Sesión
-      </ion-button>
-    </div>
-
   </div>
 </ion-content>

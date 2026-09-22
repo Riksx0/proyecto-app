@@ -1,88 +1,284 @@
-.profile-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 16px 8px;
+.eve-toolbar {
+  --background: #0d1322;
+  --color: #f1f5f9;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
 }
 
-.avatar-box {
-  text-align: center;
-  padding: 24px 16px 12px;
+.eve-content {
+  --background: #080d18;
+}
 
-  .profile-avatar-icon {
-    font-size: 96px;
-    color: var(--ion-color-primary, #3880ff);
+.pilot-profile-card {
+  margin: 16px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7));
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+
+  .portrait-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+
+    .pilot-portrait {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
+    }
+
+    .online-indicator {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      background: #10b981;
+      border: 2px solid #0b0f19;
+      border-radius: 50%;
+    }
   }
 
-  .welcome-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin: 8px 0 4px;
-    color: var(--ion-color-medium, #666);
-  }
+  .pilot-info {
+    flex: 1;
 
-  .user-display-name {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--ion-text-color, #222);
-  }
+    .security-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-bottom: 4px;
+    }
 
-  .user-handle {
-    font-size: 0.95rem;
-    color: var(--ion-color-step-600, #777);
-    margin: 4px 0 16px;
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .corp-name {
+      margin: 4px 0;
+      font-size: 12px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      ion-icon {
+        color: #38bdf8;
+      }
+    }
+
+    .hub-location {
+      font-size: 11px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      strong {
+        color: #e2e8f0;
+      }
+    }
   }
 }
 
-.info-card {
-  margin: 16px 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  margin-top: 20px;
+  margin-bottom: 12px;
 
-  ion-card-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
+  .title-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-  ion-card-subtitle {
-    font-size: 0.85rem;
-  }
-
-  ion-list {
-    background: transparent;
-    padding: 0;
-  }
-
-  ion-item {
-    --background: transparent;
-    --padding-start: 0;
-    margin-bottom: 8px;
+    .star-icon {
+      color: #eab308;
+      font-size: 18px;
+    }
 
     h3 {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--ion-color-medium, #888);
-      margin-bottom: 2px;
-    }
-
-    p {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--ion-text-color, #333);
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
     }
   }
 }
 
-.actions-box {
-  margin-top: 24px;
+.empty-state {
+  text-align: center;
+  padding: 40px 24px;
+  color: #64748b;
+
+  ion-icon {
+    font-size: 54px;
+    color: #475569;
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    color: #e2e8f0;
+    margin: 0 0 6px;
+  }
+
+  p {
+    font-size: 13px;
+    margin: 0 auto 20px;
+    max-width: 280px;
+  }
+}
+
+.favorites-grid {
+  padding: 0 16px 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
 
-  .action-btn {
-    --border-radius: 10px;
-    font-weight: 600;
-    margin: 0;
+.market-item-card {
+  margin: 0;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 14px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .item-visual {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      background: #020617;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    .item-meta {
+      flex: 1;
+
+      .item-category {
+        font-size: 10px;
+        color: #38bdf8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+      }
+
+      .item-name {
+        margin: 2px 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+
+      .station-tag {
+        font-size: 10px;
+        color: #64748b;
+      }
+    }
+
+    .remove-fav-btn {
+      background: transparent;
+      border: none;
+      padding: 6px;
+      cursor: pointer;
+
+      ion-icon {
+        font-size: 20px;
+        color: #eab308;
+      }
+    }
+  }
+
+  .card-pricing {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(51, 65, 85, 0.4);
+
+    .price-box {
+      background: rgba(2, 6, 23, 0.5);
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(51, 65, 85, 0.3);
+
+      .label {
+        display: block;
+        font-size: 10px;
+        color: #94a3b8;
+        margin-bottom: 2px;
+      }
+
+      .value {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      &.sell .value {
+        color: #38bdf8;
+      }
+
+      &.buy .value {
+        color: #34d399;
+      }
+    }
+  }
+
+  .price-loading-box {
+    margin-top: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #94a3b8;
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+
+    ion-button {
+      font-size: 11px;
+      font-weight: 600;
+    }
   }
 }

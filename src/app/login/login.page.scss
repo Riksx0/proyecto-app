@@ -1,202 +1,265 @@
-/*custom font*/
-@import url(https://fonts.googleapis.com/css?family=Montserrat);
-
-/*basic reset*/
-* {margin: 0; padding: 0;}
-
-/* Fondo de la página para Ionic */
-ion-content {
-    --background: linear-gradient(135deg, #2d0b3b, #70163c);
+.login-content {
+  --background: #0b0f19;
 }
 
-body {
-    font-family: montserrat, arial, verdana;
-}
-
-#msform {
-    width: 400px;
-    margin: 50px auto;
-    text-align: center;
-    position: relative;
-}
-
-/* Contenedor para mantener la altura mientras los elementos están en position: absolute durante la transición */
-.fieldset-container {
-  position: relative;
-  min-height: 350px; 
-}
-
-#msform fieldset {
-    background: white;
-    border: 0 none;
-    border-radius: 3px;
-    box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
-    padding: 20px 30px;
-    box-sizing: border-box;
-    width: 80%;
-    margin: 0 10%;
-    position: relative;
-}
-
-/*inputs*/
-#msform input, #msform textarea {
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    font-family: montserrat, arial, verdana;
-    
-    /* Forzar colores para evitar problemas con el modo oscuro */
-    background-color: #ffffff;
-    color: #2C3E50;
-    font-size: 13px;
-}
-
-/* Placeholders visibles */
-#msform input::placeholder, 
-#msform textarea::placeholder {
-  color: #888888;
-  opacity: 1;
-}
-
-/*buttons*/
-#msform .action-button {
-    width: 100px;
-    background: #27AE60;
-    font-weight: bold;
-    color: white;
-    border: 0 none;
-    border-radius: 1px;
-    cursor: pointer;
-    padding: 10px;
-    margin: 10px 5px;
-  text-decoration: none;
-  font-size: 14px;
-}
-#msform .action-button:hover, #msform .action-button:focus {
-    box-shadow: 0 0 0 2px white, 0 0 0 3px #27AE60;
-}
-
-/*headings*/
-.fs-title {
-    font-size: 15px;
-    text-transform: uppercase;
-    color: #2C3E50;
-    margin-bottom: 10px;
-}
-.fs-subtitle {
-    font-weight: normal;
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-/*progressbar*/
-#progressbar {
-    margin-bottom: 30px;
-    overflow: hidden;
-    counter-reset: step;
-}
-#progressbar li {
-    list-style-type: none;
-    color: white;
-    text-transform: uppercase;
-    font-size: 9px;
-    width: 33.33%;
-    float: left;
-    position: relative;
-}
-#progressbar li:before {
-    content: counter(step);
-    counter-increment: step;
-    width: 20px;
-    line-height: 20px;
-    display: block;
-    font-size: 10px;
-    color: #333;
-    background: white;
-    border-radius: 3px;
-    margin: 0 auto 5px auto;
-}
-#progressbar li:after {
-    content: '';
-    width: 100%;
-    height: 2px;
-    background: white;
-    position: absolute;
-    left: -50%;
-    top: 9px;
-    z-index: -1; 
-}
-#progressbar li:first-child:after {
-    content: none; 
-}
-
-#progressbar li.active:before,  #progressbar li.active:after{
-    background: #27AE60;
-    color: white;
-}
-
-/* ── Toggle Login / Registro ── */
-.mode-toggle {
+.space-bg {
+  min-height: 100%;
   display: flex;
+  align-items: center;
   justify-content: center;
+  padding: 24px 16px;
+  background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0b0f19 80%);
+}
+
+.login-wrapper {
+  width: 100%;
+  max-width: 440px;
+}
+
+.brand-header {
+  text-align: center;
   margin-bottom: 20px;
 
-  button {
-    flex: 1;
-    max-width: 160px;
-    padding: 10px 0;
-    border: 2px solid #27AE60;
-    background: transparent;
-    color: white;
-    font-family: montserrat, arial, verdana;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s, color 0.3s;
+  .logo-circle {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 10px;
+    background: linear-gradient(135deg, #0284c7, #38bdf8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
 
-    &:first-child {
-      border-radius: 4px 0 0 4px;
+    ion-icon {
+      font-size: 32px;
+      color: #ffffff;
     }
-    &:last-child {
-      border-radius: 0 4px 4px 0;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #f8fafc;
+    margin: 0;
+    text-shadow: 0 0 12px rgba(248, 250, 252, 0.2);
+  }
+
+  .subtitle {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #94a3b8;
+    margin: 4px 0 8px;
+    font-weight: 600;
+  }
+
+  .jita-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-radius: 20px;
+    color: #34d399;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+}
+
+.login-card {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  overflow: hidden;
+
+  .auth-mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: rgba(2, 6, 23, 0.6);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+
+    .mode-tab-btn {
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+
+      ion-icon {
+        font-size: 16px;
+      }
+
+      &.active {
+        color: #38bdf8;
+        background: rgba(14, 165, 233, 0.15);
+        border-bottom: 2px solid #38bdf8;
+      }
+    }
+  }
+
+  ion-card-title {
+    color: #f1f5f9;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  ion-card-subtitle {
+    color: #94a3b8;
+    font-size: 11px;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+}
+
+.input-group {
+  margin-bottom: 16px;
+
+  .custom-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+
+    ion-icon {
+      color: #38bdf8;
+      font-size: 14px;
+    }
+  }
+
+  .field-hint {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #38bdf8;
+    margin-top: 4px;
+  }
+
+  .input-field-wrapper {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: all 0.2s ease;
+
+    &:focus-within {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
 
-    &.active {
-      background: #27AE60;
-      color: white;
+    input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 14px;
+
+      &::placeholder {
+        color: #64748b;
+      }
     }
   }
 }
 
-/* ── Caja del formulario de login ── */
-.login-box {
-  background: white;
-  border-radius: 3px;
-  box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
-  padding: 20px 30px;
-  width: 80%;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-/* ── Mensaje de error ── */
-.error-msg {
-  background: #fdecea;
-  color: #c0392b;
-  border: 1px solid #e74c3c;
-  border-radius: 3px;
-  padding: 8px 12px;
+.message-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
   font-size: 12px;
-  margin-bottom: 10px;
-  text-align: left;
+  margin-bottom: 16px;
+
+  &.error {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+  }
+
+  &.success {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #6ee7b7;
+  }
 }
 
-/* ── Botón deshabilitado ── */
-#msform .action-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.eve-submit-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &.register-variant {
+    background: linear-gradient(135deg, #059669, #047857);
+    border-color: rgba(16, 185, 129, 0.4);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.switch-helper {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 11px;
+  color: #94a3b8;
+
+  a {
+    color: #38bdf8;
+    margin-left: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.info-footer {
+  text-align: center;
+  margin-top: 18px;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.4;
+
+  strong {
+    color: #94a3b8;
+  }
 }

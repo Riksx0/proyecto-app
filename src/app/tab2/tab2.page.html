@@ -1,31 +1,180 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> Photo Gallery </ion-title>
+  <ion-toolbar class="eve-toolbar">
+    <ion-title>Mercado de EVE (Jita 4-4)</ion-title>
   </ion-toolbar>
+  <div class="search-container">
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      (ionInput)="onSearch($event)"
+      placeholder="Buscar naves, PLEX, minerales, munición..."
+      debounce="200"
+      class="eve-searchbar"
+    ></ion-searchbar>
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Photo Gallery</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="eve-content">
+  <!-- Detalle del Ítem Seleccionado (Tarjeta Flotante Superior) -->
+  <div class="selected-item-section" *ngIf="selectedItem">
+    <ion-card class="detail-card">
+      <div class="detail-header">
+        <div class="item-avatar">
+          <img [src]="selectedItem.iconUrl || 'https://wsrv.nl/?url=https://images.evetech.net/types/' + selectedItem.typeId + '/icon?size=64&w=64'" [alt]="selectedItem.name" />
+        </div>
+        <div class="item-title-box">
+          <div class="path-badge">{{ selectedItem.categoryName }} > {{ selectedItem.groupName }}</div>
+          <h2>{{ selectedItem.name }}</h2>
+          <span class="type-id-tag">Type ID: {{ selectedItem.typeId }}</span>
+        </div>
+      </div>
 
-  <ion-grid>
-    <ion-row>
-      @for (photo of photoService.photos(); track photo.filepath; let position = $index) {
-      <ion-col size="6">
-        <button (click)="showActionSheet(photo, position)">
-          <img [src]="photo.webviewPath" [attr.alt]="'Photo ' + (position + 1)" loading="lazy" />
+      <p class="item-description" *ngIf="selectedItem.description">
+        {{ selectedItem.description }}
+      </p>
+
+      <div class="pricing-container" *ngIf="!loadingPrice; else loadingPriceTpl">
+        <div class="market-hub-tag">
+          <ion-icon name="storefront-outline"></ion-icon>
+          <span>{{ selectedPrice?.stationName || 'Jita IV - Moon 4 (The Forge)' }}</span>
+        </div>
+
+        <div class="prices-grid">
+          <div class="price-cell sell-cell">
+            <span class="type-label">Venta Mínima (Sell Min)</span>
+            <span class="price-value">{{ formatIsk(selectedPrice?.sellMin) }}</span>
+            <span class="volume-hint" *ngIf="selectedPrice && selectedPrice.sellVolume">Vol: {{ selectedPrice.sellVolume | number }} un.</span>
+          </div>
+
+          <div class="price-cell buy-cell">
+            <span class="type-label">Compra Máxima (Buy Max)</span>
+            <span class="price-value">{{ formatIsk(selectedPrice?.buyMax) }}</span>
+            <span class="volume-hint" *ngIf="selectedPrice && selectedPrice.buyVolume">Vol: {{ selectedPrice.buyVolume | number }} un.</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #loadingPriceTpl>
+        <div class="loading-price-box">
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
+          <span>Consultando órdenes en The Forge (ESI)...</span>
+        </div>
+      </ng-template>
+
+      <!-- Botones de Acción: Favorito y Analyzer -->
+      <div class="action-buttons-grid">
+        <button
+          class="eve-btn fav-btn"
+          [class.active]="isFavorite(selectedItem.typeId)"
+          (click)="toggleFavorite(selectedItem)"
+        >
+          <ion-icon [name]="isFavorite(selectedItem.typeId) ? 'star' : 'star-outline'"></ion-icon>
+          <span>{{ isFavorite(selectedItem.typeId) ? 'En Favoritos' : '⭐ Agregar Favorito' }}</span>
         </button>
-      </ion-col>
-      }
-    </ion-row>
-  </ion-grid>
 
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="addPhotoToGallery()">
-      <ion-icon name="camera"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+        <button
+          class="eve-btn analyzer-btn"
+          [class.active]="isInAnalyzer(selectedItem.typeId)"
+          (click)="toggleAnalyzer(selectedItem)"
+        >
+          <ion-icon [name]="isInAnalyzer(selectedItem.typeId) ? 'trending-up' : 'trending-up-outline'"></ion-icon>
+          <span>{{ isInAnalyzer(selectedItem.typeId) ? 'En Analyzer' : '📈 Agregar Analyzer' }}</span>
+        </button>
+
+        <button class="eve-btn view-trend-btn" (click)="goToAnalyzer(selectedItem)">
+          <span>Analizar Gráfica</span>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </div>
+    </ion-card>
+  </div>
+
+  <!-- Resultados de Búsqueda -->
+  <div class="search-results-section" *ngIf="searchQuery.trim() !== ''">
+    <div class="section-title">
+      <h3>Resultados de Búsqueda ({{ searchResults.length }})</h3>
+    </div>
+
+    <div class="empty-search" *ngIf="searchResults.length === 0">
+      <ion-icon name="search-outline"></ion-icon>
+      <p>No se encontraron ítems que coincidan con "{{ searchQuery }}"</p>
+    </div>
+
+    <div class="items-list">
+      <div
+        *ngFor="let item of searchResults"
+        class="market-row"
+        [class.selected]="selectedItem?.typeId === item.typeId"
+        (click)="selectItem(item)"
+      >
+        <img [src]="item.iconUrl || 'https://wsrv.nl/?url=https://images.evetech.net/types/' + item.typeId + '/icon?size=64&w=64'" [alt]="item.name" class="row-icon" />
+        <div class="row-details">
+          <span class="row-name">{{ item.name }}</span>
+          <span class="row-path">{{ item.categoryName }} • {{ item.groupName }}</span>
+        </div>
+        <div class="row-actions">
+          <button class="mini-btn" (click)="$event.stopPropagation(); toggleFavorite(item)">
+            <ion-icon [name]="isFavorite(item.typeId) ? 'star' : 'star-outline'" [class.fav-active]="isFavorite(item.typeId)"></ion-icon>
+          </button>
+          <button class="mini-btn" (click)="$event.stopPropagation(); toggleAnalyzer(item)">
+            <ion-icon [name]="isInAnalyzer(item.typeId) ? 'trending-up' : 'trending-up-outline'" [class.analyzer-active]="isInAnalyzer(item.typeId)"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menú de Categorías (Árbol de Mercado de EVE) -->
+  <div class="market-tree-section" *ngIf="searchQuery.trim() === ''">
+    <div class="section-title">
+      <h3>Categorías del Mercado</h3>
+      <span class="sub-hint">Explora como en el cliente in-game</span>
+    </div>
+
+    <ion-accordion-group [multiple]="true" class="eve-accordions">
+      <ion-accordion *ngFor="let cat of categories; let i = index" [value]="'cat-' + i">
+        <ion-item slot="header" class="category-header-item">
+          <ion-icon [name]="cat.icon" slot="start" class="cat-icon"></ion-icon>
+          <ion-label class="cat-label">{{ cat.name }}</ion-label>
+        </ion-item>
+
+        <div slot="content" class="category-body">
+          <div *ngFor="let grp of cat.groups" class="group-wrapper">
+            <div class="group-title">{{ grp.name }}</div>
+
+            <div class="group-items-grid">
+              <div
+                *ngFor="let it of grp.items"
+                class="tree-item-card"
+                [class.selected]="selectedItem?.typeId === it.typeId"
+                (click)="selectItem(it)"
+              >
+                <div class="tree-item-avatar">
+                  <img [src]="'https://wsrv.nl/?url=https://images.evetech.net/types/' + it.typeId + '/icon?size=64&w=64'" [alt]="it.name" />
+                </div>
+                <div class="tree-item-info">
+                  <span class="tree-item-name">{{ it.name }}</span>
+                </div>
+                <div class="tree-actions" (click)="$event.stopPropagation()">
+                  <button class="icon-toggle" (click)="toggleFavorite(it)" title="Favorito">
+                    <ion-icon [name]="isFavorite(it.typeId) ? 'star' : 'star-outline'" [class.active-fav]="isFavorite(it.typeId)"></ion-icon>
+                  </button>
+                  <button class="icon-toggle" (click)="toggleAnalyzer(it)" title="Analyzer">
+                    <ion-icon [name]="isInAnalyzer(it.typeId) ? 'trending-up' : 'trending-up-outline'" [class.active-ana]="isInAnalyzer(it.typeId)"></ion-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </div>
+
+  <ion-toast
+    [isOpen]="showToast"
+    [message]="toastMessage"
+    [duration]="2000"
+    (didDismiss)="showToast = false"
+    position="bottom"
+  ></ion-toast>
 </ion-content>

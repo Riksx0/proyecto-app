@@ -1,82 +1,191 @@
-<ion-content>
-  <form id="msform">
-
-    <!-- TABS: Login / Registro -->
-    <div class="mode-toggle">
-      <button type="button" [class.active]="mode === 'login'" (click)="setMode('login')">Iniciar Sesión</button>
-      <button type="button" [class.active]="mode === 'register'" (click)="setMode('register')">Registrarse</button>
-    </div>
-
-    <!-- ==================== MODO LOGIN ==================== -->
-    <div *ngIf="mode === 'login'" class="login-box">
-      <h2 class="fs-title">Bienvenido</h2>
-      <h3 class="fs-subtitle">Ingresa tus credenciales</h3>
-
-      <input type="text" name="lemail" [(ngModel)]="userData.email" placeholder="Correo electrónico" />
-      <input type="password" name="lpass" [(ngModel)]="userData.pass" placeholder="Contraseña" />
-
-      <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
-
-      <input
-        type="button"
-        class="action-button submit"
-        [value]="loading ? 'Cargando...' : 'Entrar'"
-        [disabled]="loading"
-        (click)="iniciarSesion()"
-      />
-    </div>
-
-    <!-- ==================== MODO REGISTRO ==================== -->
-    <div *ngIf="mode === 'register'">
-      <ul id="progressbar">
-        <li [class.active]="currentStep >= 1">Cuenta</li>
-        <li [class.active]="currentStep >= 2">Redes</li>
-        <li [class.active]="currentStep >= 3">Datos</li>
-      </ul>
-
-      <div class="fieldset-container" [@stepAnimation]="currentStep">
-
-        <fieldset *ngIf="currentStep === 1">
-          <h2 class="fs-title">Crear cuenta</h2>
-          <h3 class="fs-subtitle">Paso 1 de 3</h3>
-          <input type="text"     name="email" [(ngModel)]="userData.email" placeholder="Correo electrónico" />
-          <input type="password" name="pass"  [(ngModel)]="userData.pass"  placeholder="Contraseña" />
-          <input type="password" name="cpass" [(ngModel)]="userData.cpass" placeholder="Confirmar contraseña" />
-          <input type="button" class="next action-button" value="Siguiente" (click)="next()" />
-        </fieldset>
-
-        <fieldset *ngIf="currentStep === 2">
-          <h2 class="fs-title">Redes Sociales</h2>
-          <h3 class="fs-subtitle">Paso 2 de 3</h3>
-          <input type="text" name="twitter"  [(ngModel)]="userData.twitter"  placeholder="Twitter" />
-          <input type="text" name="facebook" [(ngModel)]="userData.facebook" placeholder="Facebook" />
-          <input type="text" name="gplus"    [(ngModel)]="userData.gplus"    placeholder="Google+" />
-          <input type="button" class="previous action-button" value="Anterior"  (click)="previous()" />
-          <input type="button" class="next action-button"     value="Siguiente" (click)="next()" />
-        </fieldset>
-
-        <fieldset *ngIf="currentStep === 3">
-          <h2 class="fs-title">Datos Personales</h2>
-          <h3 class="fs-subtitle">Paso 3 de 3</h3>
-          <input type="text" name="fname"   [(ngModel)]="userData.fname"   placeholder="Nombre" />
-          <input type="text" name="lname"   [(ngModel)]="userData.lname"   placeholder="Apellido" />
-          <input type="text" name="phone"   [(ngModel)]="userData.phone"   placeholder="Teléfono" />
-          <textarea          name="address" [(ngModel)]="userData.address"  placeholder="Dirección"></textarea>
-
-          <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
-
-          <input type="button" class="previous action-button" value="Anterior" (click)="previous()" />
-          <input
-            type="button"
-            class="submit action-button"
-            [value]="loading ? 'Registrando...' : 'Registrarse'"
-            [disabled]="loading"
-            (click)="submit()"
-          />
-        </fieldset>
-
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="space-bg">
+    <div class="stars"></div>
+    <div class="login-wrapper">
+      <div class="brand-header">
+        <div class="logo-circle">
+          <ion-icon name="rocket-outline"></ion-icon>
+        </div>
+        <h1>EVE ONLINE</h1>
+        <p class="subtitle">MARKET MANAGER & ANALYZER</p>
+        <span class="jita-badge">Tranquility Live Feed</span>
       </div>
-    </div>
 
-  </form>
+      <ion-card class="login-card">
+        <!-- Selector de Modo: Login vs Registro -->
+        <div class="auth-mode-switch">
+          <button
+            type="button"
+            class="mode-tab-btn"
+            [class.active]="mode === 'login'"
+            (click)="setMode('login')"
+          >
+            <ion-icon name="person-outline"></ion-icon>
+            <span>Iniciar Sesión</span>
+          </button>
+          <button
+            type="button"
+            class="mode-tab-btn"
+            [class.active]="mode === 'register'"
+            (click)="setMode('register')"
+          >
+            <ion-icon name="person-add-outline"></ion-icon>
+            <span>Registrar Piloto</span>
+          </button>
+        </div>
+
+        <ion-card-header>
+          <ion-card-title>
+            {{ mode === 'login' ? 'Acceso a Terminal de Mercado' : 'Registro de Nuevo Piloto' }}
+          </ion-card-title>
+          <ion-card-subtitle>
+            {{ mode === 'login'
+                ? 'Ingresa tus credenciales para sincronizar tu mercado y favoritos'
+                : 'Crea tu cuenta. Vincularemos tu portrait oficial de EVE Online automáticamente' }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <!-- FORMULARIO DE LOGIN -->
+          <form *ngIf="mode === 'login'" (ngSubmit)="iniciarSesion()">
+            <div class="input-group">
+              <label class="custom-label">
+                <ion-icon name="person-outline"></ion-icon>
+                Nombre de Piloto (Usuario)
+              </label>
+              <div class="input-field-wrapper">
+                <input
+                  type="text"
+                  name="username"
+                  [(ngModel)]="username"
+                  placeholder="Ej: CCP Tuxford, The Mittani..."
+                  required
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="custom-label">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                Contraseña
+              </label>
+              <div class="input-field-wrapper">
+                <input
+                  type="password"
+                  name="pass"
+                  [(ngModel)]="pass"
+                  placeholder="••••••••"
+                  required
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
+            <div class="message-box error" *ngIf="errorMsg">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>{{ errorMsg }}</span>
+            </div>
+
+            <div class="message-box success" *ngIf="successMsg">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>{{ successMsg }}</span>
+            </div>
+
+            <button type="submit" class="eve-submit-btn" [disabled]="loading">
+              <span *ngIf="!loading">INGRESAR AL MERCADO</span>
+              <ion-spinner name="crescent" *ngIf="loading"></ion-spinner>
+            </button>
+
+            <div class="switch-helper">
+              <span>¿No tienes cuenta de piloto?</span>
+              <a (click)="setMode('register')">Registrarse</a>
+            </div>
+          </form>
+
+          <!-- FORMULARIO DE REGISTRO -->
+          <form *ngIf="mode === 'register'" (ngSubmit)="registrar()">
+            <div class="input-group">
+              <label class="custom-label">
+                <ion-icon name="person-outline"></ion-icon>
+                Nombre de Piloto (EVE Character)
+              </label>
+              <div class="input-field-wrapper">
+                <input
+                  type="text"
+                  name="regUsername"
+                  [(ngModel)]="username"
+                  placeholder="Nombre de personaje en EVE..."
+                  required
+                  [disabled]="loading"
+                />
+              </div>
+              <small class="field-hint">
+                <ion-icon name="sparkles-outline"></ion-icon>
+                Se obtendrá tu retrato oficial de New Eden mediante ESI
+              </small>
+            </div>
+
+            <div class="input-group">
+              <label class="custom-label">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                Contraseña
+              </label>
+              <div class="input-field-wrapper">
+                <input
+                  type="password"
+                  name="regPass"
+                  [(ngModel)]="pass"
+                  placeholder="Mínimo 4 caracteres"
+                  required
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="custom-label">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                Confirmar Contraseña
+              </label>
+              <div class="input-field-wrapper">
+                <input
+                  type="password"
+                  name="regConfirmPass"
+                  [(ngModel)]="confirmPass"
+                  placeholder="Repite tu contraseña"
+                  required
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
+            <div class="message-box error" *ngIf="errorMsg">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>{{ errorMsg }}</span>
+            </div>
+
+            <div class="message-box success" *ngIf="successMsg">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>{{ successMsg }}</span>
+            </div>
+
+            <button type="submit" class="eve-submit-btn register-variant" [disabled]="loading">
+              <span *ngIf="!loading">CREAR CUENTA DE PILOTO</span>
+              <ion-spinner name="crescent" *ngIf="loading"></ion-spinner>
+            </button>
+
+            <div class="switch-helper">
+              <span>¿Ya estás registrado?</span>
+              <a (click)="setMode('login')">Iniciar Sesión</a>
+            </div>
+          </form>
+
+          <div class="info-footer">
+            <small>🔒 <strong>Sesión segura:</strong> Al cerrar la app se cerrará la sesión automáticamente.</small>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
 </ion-content>
