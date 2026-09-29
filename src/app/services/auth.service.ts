@@ -55,11 +55,12 @@ export class AuthService {
   // REGISTRO
   // ─────────────────────────────────────────────────────────────────────────────
 
+  // ⚠️ IMPORTANTE: Cambia esta URL por la que te dio Railway (ej: https://tu-app.up.railway.app/api-backend)
+  // o tu IP local para probar en XAMPP (ej: http://192.168.1.15/api-backend)
+  private readonly API_URL = 'http://192.168.4.252/api';
+
   /**
-   * Registra un nuevo usuario:
-   * 1. Verifica que el nombre de usuario no esté tomado.
-   * 2. Resuelve el personaje en EVE ESI (opcional, si existe en el juego).
-   * 3. Guarda en localStorage con contraseña hasheada.
+   * Registra un nuevo usuario en la base de datos PHP:
    */
   register(username: string, password: string): Observable<{ success: boolean; message: string }> {
     const trimmedUser = username.trim();
@@ -72,58 +73,19 @@ export class AuthService {
       return of({ success: false, message: 'La contraseña debe tener al menos 4 caracteres.' });
     }
 
-    const users = this.loadUsersDB();
-    const exists = users.some(u => u.username.toLowerCase() === trimmedUser.toLowerCase());
-    if (exists) {
-      return of({ success: false, message: `El nombre de piloto "${trimmedUser}" ya está registrado.` });
-    }
+    // Enviamos directamente el nombre de piloto y contraseña al backend
+    const payload = { username: trimmedUser, password: password };
 
-    return this.http.post<any>(this.ESI_IDS_URL, [trimmedUser]).pipe(
-      switchMap(async res => {
-        let characterId: number | undefined;
-        let charName = trimmedUser;
-
-        if (res && res.characters && res.characters.length > 0) {
-          characterId = res.characters[0].id;
-          charName = res.characters[0].name;
+    return this.http.post<any>(`${this.API_URL}/register.php`, payload).pipe(
+      map(res => {
+        if (res.status === 'success') {
+          return { success: true, message: `¡Piloto ${trimmedUser} registrado correctamente en la base de datos!` };
         }
-
-        const passwordHash = await this.hashPassword(password);
-        const portraitUrl = this.buildPortraitUrl(characterId, charName);
-
-        const newUser: StoredUser = {
-          username: charName,
-          passwordHash,
-          characterId,
-          portraitUrl,
-          corporation: characterId ? 'Corporación Galáctica EVE' : 'Piloto Independiente',
-          registeredAt: new Date().toISOString()
-        };
-
-        const allUsers = this.loadUsersDB();
-        allUsers.push(newUser);
-        this.saveUsersDB(allUsers);
-
-        return { success: true, message: `¡Piloto ${charName} registrado correctamente! Ya puedes iniciar sesión.` };
+        return { success: false, message: res.message || 'Error al registrar.' };
       }),
       catchError(err => {
-        console.warn('ESI lookup failed during register, continuing without characterId', err);
-        return from(this.hashPassword(password)).pipe(
-          map(passwordHash => {
-            const portraitUrl = this.buildPortraitUrl(undefined, trimmedUser);
-            const newUser: StoredUser = {
-              username: trimmedUser,
-              passwordHash,
-              portraitUrl,
-              corporation: 'Piloto Independiente',
-              registeredAt: new Date().toISOString()
-            };
-            const allUsers = this.loadUsersDB();
-            allUsers.push(newUser);
-            this.saveUsersDB(allUsers);
-            return { success: true, message: `¡Piloto ${trimmedUser} registrado! (Sin verificación ESI).` };
-          })
-        );
+        console.error('Error en registro PHP:', err);
+        return of({ success: false, message: 'Error de conexión con el servidor de la base de datos.' });
       })
     );
   }
@@ -133,8 +95,7 @@ export class AuthService {
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
-   * Inicia sesión verificando el hash de contraseña.
-   * La sesión se guarda en sessionStorage (se borra automáticamente al cerrar la app/pestaña).
+   * Inicia sesión verificando en la base de datos PHP.
    */
   login(username: string, password: string): Observable<{ success: boolean; user?: UserProfile; message?: string }> {
     const trimmedUser = username.trim();
@@ -143,31 +104,28 @@ export class AuthService {
       return of({ success: false, message: 'Por favor ingresa tu nombre de piloto y contraseña.' });
     }
 
-    const users = this.loadUsersDB();
-    const storedUser = users.find(u => u.username.toLowerCase() === trimmedUser.toLowerCase());
+    const payload = { username: trimmedUser, password: password };
 
-    if (!storedUser) {
-      return of({ success: false, message: `El piloto "${trimmedUser}" no está registrado. ¿Deseas registrarte?` });
-    }
-
-    return from(this.hashPassword(password)).pipe(
-      map(hash => {
-        if (hash !== storedUser.passwordHash) {
-          return { success: false, message: 'Contraseña incorrecta.' };
+    return this.http.post<any>(`${this.API_URL}/login.php`, payload).pipe(
+      map(res => {
+        if (res.status === 'success' && res.user) {
+          const userProfile: UserProfile = {
+            username: res.user.username || trimmedUser,
+            characterId: res.user.id,
+            portraitUrl: this.buildPortraitUrl(undefined, trimmedUser),
+            corporation: 'Piloto Independiente',
+            securityStatus: 5.0
+          };
+          
+          // Guardar sesión localmente (solo la sesión, no la base de datos de usuarios)
+          sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(userProfile));
+          return { success: true, user: userProfile, message: 'Login exitoso.' };
         }
-
-        const userProfile: UserProfile = {
-          username: storedUser.username,
-          characterId: storedUser.characterId,
-          portraitUrl: storedUser.portraitUrl,
-          corporation: storedUser.corporation,
-          securityStatus: 5.0
-        };
-
-        // Guardar en sessionStorage — se borra automáticamente al cerrar la app
-        sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(userProfile));
-
-        return { success: true, user: userProfile };
+        return { success: false, message: res.message || 'Credenciales incorrectas.' };
+      }),
+      catchError(err => {
+        console.error('Error en login PHP:', err);
+        return of({ success: false, message: 'Error de conexión con el servidor de la base de datos.' });
       })
     );
   }

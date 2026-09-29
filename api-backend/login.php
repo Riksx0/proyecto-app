@@ -21,15 +21,15 @@ try {
 
 $data = json_decode(file_get_contents("php://input"));
 
-if(isset($data->email) && isset($data->pass)) {
-    // Buscar al usuario por correo
-    $sql = "SELECT id, email, password, fname FROM users WHERE email = ?";
+if(isset($data->username) && isset($data->password)) {
+    // Buscar al usuario por username
+    $sql = "SELECT id, username, password FROM users WHERE username = ?";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$data->email]);
+    $stmt->execute([$data->username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Verificar si el usuario existe y la contraseña coincide
-    if($user && password_verify($data->pass, $user['password'])) {
+    if($user && password_verify($data->password, $user['password'])) {
         unset($user['password']); // No enviar la contraseña al frontend por seguridad
         echo json_encode([
             "status" => "success", 
@@ -37,7 +37,7 @@ if(isset($data->email) && isset($data->pass)) {
             "user" => $user
         ]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Correo o contraseña incorrectos."]);
+        echo json_encode(["status" => "error", "message" => "Piloto o contraseña incorrectos."]);
     }
 } else {
     echo json_encode(["status" => "error", "message" => "Datos incompletos."]);

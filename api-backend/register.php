@@ -26,22 +26,21 @@ try {
 // Recibir los datos de Angular
 $data = json_decode(file_get_contents("php://input"));
 
-if(isset($data->email) && isset($data->pass)) {
+if(isset($data->username) && isset($data->password)) {
     // Hashear la contraseña antes de guardarla (Práctica esencial de seguridad)
-    $passHash = password_hash($data->pass, PASSWORD_BCRYPT);
+    $passHash = password_hash($data->password, PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO users (email, password, fname) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
     $stmt = $pdo->prepare($sql);
 
     try {
         $stmt->execute([
-            $data->email, 
-            $passHash, 
-            $data->fname ?? ''
+            $data->username, 
+            $passHash
         ]);
         echo json_encode(["status" => "success", "message" => "Cuenta creada exitosamente."]);
     } catch (Exception $e) {
-        echo json_encode(["status" => "error", "message" => "El correo ya existe o hubo un error."]);
+        echo json_encode(["status" => "error", "message" => "El piloto ya existe o hubo un error."]);
     }
 } else {
     echo json_encode(["status" => "error", "message" => "Datos incompletos."]);
