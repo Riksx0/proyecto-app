@@ -23,7 +23,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 if(isset($data->email) && isset($data->pass)) {
     // Buscar al usuario por correo
-    $sql = "SELECT id, email, password, fname, lname FROM users WHERE email = ?";
+    $sql = "SELECT id, email, password, fname FROM users WHERE email = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$data->email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);

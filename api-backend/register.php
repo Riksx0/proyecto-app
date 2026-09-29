@@ -30,21 +30,14 @@ if(isset($data->email) && isset($data->pass)) {
     // Hashear la contraseña antes de guardarla (Práctica esencial de seguridad)
     $passHash = password_hash($data->pass, PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO users (email, password, twitter, facebook, gplus, fname, lname, phone, address) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO users (email, password, fname) VALUES (?, ?, ?)";
     $stmt = $pdo->prepare($sql);
 
     try {
         $stmt->execute([
             $data->email, 
             $passHash, 
-            $data->twitter ?? '', 
-            $data->facebook ?? '',
-            $data->gplus ?? '', 
-            $data->fname ?? '', 
-            $data->lname ?? '',
-            $data->phone ?? '', 
-            $data->address ?? ''
+            $data->fname ?? ''
         ]);
         echo json_encode(["status" => "success", "message" => "Cuenta creada exitosamente."]);
     } catch (Exception $e) {
