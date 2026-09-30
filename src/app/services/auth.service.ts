@@ -57,7 +57,7 @@ export class AuthService {
 
   // ⚠️ IMPORTANTE: Cambia esta URL por la que te dio Railway (ej: https://tu-app.up.railway.app/api-backend)
   // o tu IP local para probar en XAMPP (ej: http://192.168.1.15/api-backend)
-  private readonly API_URL = 'http://192.168.4.252/api';
+  private readonly API_URL = 'http://localhost/api';
 
   /**
    * Registra un nuevo usuario en la base de datos PHP:

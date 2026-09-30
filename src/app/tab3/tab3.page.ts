@@ -324,7 +324,7 @@ export class Tab3Page implements OnInit, AfterViewInit, OnDestroy {
             borderWidth: 1,
             padding: 10,
             callbacks: {
-              label: (context) => {
+              label: (context: any) => {
                 const val = context.parsed.y;
                 return ` ${context.dataset.label}: ${this.formatIsk(val !== null ? val : 0)}`;
               }
