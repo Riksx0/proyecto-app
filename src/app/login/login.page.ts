@@ -23,7 +23,8 @@ import {
   checkmarkCircleOutline,
   alertCircleOutline,
   shieldCheckmarkOutline,
-  sparklesOutline
+  sparklesOutline,
+  serverOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -55,11 +56,14 @@ export class LoginPage {
   errorMsg: string = '';
   successMsg: string = '';
 
+  serverIp: string = '';
+
   constructor(
     private authService: AuthService,
     private marketService: EveMarketService,
     private router: Router
   ) {
+    this.serverIp = this.authService.getServerIp();
     addIcons({
       personOutline,
       personAddOutline,
@@ -68,8 +72,13 @@ export class LoginPage {
       checkmarkCircleOutline,
       alertCircleOutline,
       shieldCheckmarkOutline,
-      sparklesOutline
+      sparklesOutline,
+      serverOutline
     });
+  }
+
+  onServerIpChange() {
+    this.authService.setServerIp(this.serverIp);
   }
 
   setMode(newMode: 'login' | 'register') {

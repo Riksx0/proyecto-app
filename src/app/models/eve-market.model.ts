@@ -41,6 +41,11 @@ export interface UserProfile {
   characterId?: number;
   portraitUrl: string;
   corporation?: string;
+  corporationId?: number;
+  corporationLogoUrl?: string;
+  alliance?: string;
+  allianceId?: number;
+  allianceLogoUrl?: string;
   securityStatus?: number;
 }
 

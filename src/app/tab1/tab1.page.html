@@ -24,11 +24,22 @@
       <div class="online-indicator"></div>
     </div>
     <div class="pilot-info">
-      <span class="security-badge">+5.0 CONCORD Clean</span>
+      <span class="security-badge">
+        {{ (user?.securityStatus !== undefined && user?.securityStatus !== null) ? ((user?.securityStatus! >= 0 ? '+' : '') + user?.securityStatus?.toFixed(1)) : '+5.0' }} CONCORD Clean
+      </span>
       <h2>{{ user?.username || 'Piloto EVE' }}</h2>
       <p class="corp-name">
-        <ion-icon name="shield-checkmark-outline"></ion-icon>
-        {{ user?.corporation || 'Federación Galáctica' }}
+        <span class="corp-logos" *ngIf="user?.corporationLogoUrl || user?.allianceLogoUrl">
+          <img *ngIf="user?.corporationLogoUrl" [src]="user?.corporationLogoUrl" alt="Corp Logo" class="corp-logo-img" [title]="user?.corporation" />
+          <img *ngIf="user?.allianceLogoUrl" [src]="user?.allianceLogoUrl" alt="Alliance Logo" class="corp-logo-img" [title]="user?.alliance" />
+        </span>
+        <ion-icon name="shield-checkmark-outline" *ngIf="!user?.corporationLogoUrl && !user?.allianceLogoUrl"></ion-icon>
+        <span class="corp-label">
+          <ng-container *ngIf="user?.corporation; else independent">
+            Piloto de: <strong>{{ user?.corporation }}</strong><span *ngIf="user?.alliance">, <strong>{{ user?.alliance }}</strong></span>
+          </ng-container>
+          <ng-template #independent>Piloto Independiente</ng-template>
+        </span>
       </p>
       <div class="hub-location">
         <ion-icon name="storefront-outline"></ion-icon>

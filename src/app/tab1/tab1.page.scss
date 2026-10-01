@@ -73,10 +73,33 @@
       color: #94a3b8;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      flex-wrap: wrap;
 
       ion-icon {
         color: #38bdf8;
+      }
+
+      .corp-logos {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        .corp-logo-img {
+          width: 22px;
+          height: 22px;
+          border-radius: 4px;
+          object-fit: contain;
+          background: rgba(15, 23, 42, 0.7);
+          border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+      }
+
+      .corp-label {
+        strong {
+          color: #f1f5f9;
+          font-weight: 600;
+        }
       }
     }
 

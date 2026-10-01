@@ -105,6 +105,24 @@ export class Tab1Page implements OnInit, OnDestroy {
     if (this.user?.username) {
       this.marketService.loadUserData(this.user.username);
     }
+    if (this.user?.characterId && (!this.user?.corporationLogoUrl && !this.user?.corporation)) {
+      const charId = this.user.characterId;
+      this.authService.fetchCharacterDetails(charId).subscribe(details => {
+        if (this.user && this.user.characterId === charId) {
+          this.user.corporation = details.corporation;
+          this.user.corporationId = details.corporationId;
+          this.user.corporationLogoUrl = details.corporationLogoUrl;
+          this.user.alliance = details.alliance;
+          this.user.allianceId = details.allianceId;
+          this.user.allianceLogoUrl = details.allianceLogoUrl;
+          if (details.securityStatus !== undefined) {
+            this.user.securityStatus = details.securityStatus;
+          }
+          sessionStorage.setItem('eve_active_session', JSON.stringify(this.user));
+          this.cdr.detectChanges();
+        }
+      });
+    }
     this.cdr.detectChanges();
   }
 

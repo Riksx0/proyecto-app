@@ -82,6 +82,24 @@
               </div>
             </div>
 
+            <div class="input-group">
+              <label class="custom-label">
+                <ion-icon name="server-outline"></ion-icon>
+                IP del Servidor (Backend)
+              </label>
+              <div class="input-field-wrapper">
+                <input
+                  type="text"
+                  name="serverIp"
+                  [(ngModel)]="serverIp"
+                  (ngModelChange)="onServerIpChange()"
+                  placeholder="Ej: 192.168.1.15 o localhost"
+                  required
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
             <div class="message-box error" *ngIf="errorMsg">
               <ion-icon name="alert-circle-outline"></ion-icon>
               <span>{{ errorMsg }}</span>
@@ -154,6 +172,24 @@
                   name="regConfirmPass"
                   [(ngModel)]="confirmPass"
                   placeholder="Repite tu contraseña"
+                  required
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="custom-label">
+                <ion-icon name="server-outline"></ion-icon>
+                IP del Servidor (Backend)
+              </label>
+              <div class="input-field-wrapper">
+                <input
+                  type="text"
+                  name="serverIpReg"
+                  [(ngModel)]="serverIp"
+                  (ngModelChange)="onServerIpChange()"
+                  placeholder="Ej: 192.168.1.15 o localhost"
                   required
                   [disabled]="loading"
                 />
